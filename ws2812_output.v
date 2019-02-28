@@ -11,21 +11,23 @@ module ws2812_output(input wire clk, input wire rst, input wire trigger, input w
 	localparam TIME_T1L   = $rtoi( 600e-9 * INPUT_CLOCK) - 1;
 	localparam TIME_RESET = $rtoi(  60e-6 * INPUT_CLOCK) - 1;
 
+	localparam MAXTIME_HI = (TIME_T0H > TIME_T1H) ? TIME_T0H : TIME_T1H;
+	localparam MAXTIME_LO = (TIME_T0L > TIME_T1L) ? TIME_T0L : TIME_T1L;
+
 	// possible state
 	localparam IDLE = 0;
 	localparam RECEIVE = 1;
 	localparam TRANSMIT_HI = 2;
 	localparam TRANSMIT_LO = 3;
 	localparam TAILGUARD = 4;
-	localparam STATEMAX = 5;
 
-	reg [$clog2(STATEMAX)-1:0] state = IDLE;
+	reg [$clog2(TAILGUARD):0] state = IDLE;
 
 	reg [6:0] tx_data;
-	reg [2:0] tx_bits;
-	reg [$clog2(TIME_T0H+TIME_T1H)-1:0] timer_high;
-	reg [$clog2(TIME_T0L+TIME_T1L)-1:0] timer_low;
-	reg [$clog2(TIME_RESET)-1:0] timer_tail;
+	reg [$clog2(7)-1:0] tx_bits;
+	reg [$clog2(MAXTIME_HI):0] timer_high;
+	reg [$clog2(MAXTIME_LO):0] timer_low;
+	reg [$clog2(TIME_RESET):0] timer_tail;
 
 	assign data_request = (RECEIVE == state);
 	assign out = (TRANSMIT_HI == state);
