@@ -3,6 +3,7 @@ DEVICE=hx1k
 PACKAGE=tq144
 PCF=icestick.pcf
 
+QUIET=-q
 
 
 
@@ -34,12 +35,12 @@ top.json: \
 
 
 %.json: %.v
-	yosys -Q -q -p 'synth_ice40 -top $(subst .v,,$<) -json $@' $^
+	yosys -Q $(QUIET) -p 'synth_ice40 -top $(subst .v,,$<) -json $@' $^
 
 %.asc: %.json
 	@# "--force" is required because nextpnr sees the combinatorial
 	@# loop of a ringoscillator and raises an error
-	nextpnr-ice40 -q --force --$(DEVICE) --package $(PACKAGE) --pcf $(PCF) --json $< --asc $@
+	nextpnr-ice40 $(QUIET) --force --$(DEVICE) --package $(PACKAGE) --pcf $(PCF) --json $< --asc $@
 
 %.bin: %.asc
 	icepack $< $@
