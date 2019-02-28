@@ -3,7 +3,7 @@ DEVICE=hx1k
 PACKAGE=tq144
 PCF=icestick.pcf
 
-QUIET=-q
+#QUIET=-q
 
 
 
@@ -29,6 +29,7 @@ clean:
 
 
 top.json: \
+	ws2812_output.v \
 	top.v
 
 
