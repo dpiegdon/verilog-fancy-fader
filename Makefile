@@ -29,6 +29,9 @@ clean:
 
 
 top.json: \
+	buildingblocks/ringoscillator.v \
+	buildingblocks/lfsr.v \
+	buildingblocks/random.v \
 	ws2812_output.v \
 	top.v
 
