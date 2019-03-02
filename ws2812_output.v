@@ -70,8 +70,8 @@ module ws2812_output(input wire clk, input wire rst, input wire trigger, input w
 					timer_low = timer_low-1;
 				end else begin
 					if(tx_bits) begin
-						timer_high <= (tx_data[tx_bits]) ? TIME_T1H : TIME_T0H;
-						timer_low  <= (tx_data[tx_bits]) ? TIME_T1L : TIME_T0L;
+						timer_high <= (tx_data[tx_bits-1]) ? TIME_T1H : TIME_T0H;
+						timer_low  <= (tx_data[tx_bits-1]) ? TIME_T1L : TIME_T0L;
 						tx_bits <= tx_bits-1;
 						state <= TRANSMIT_HI;
 					end else begin
