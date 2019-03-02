@@ -19,9 +19,8 @@ module top(input wire CLK, output wire J1_7, output wire J1_8, output wire J1_9,
 	assign trigger = !wait_for_tailguard;
 	assign trigger = J1_7;
 
-	wire [15:0] random;
-	wire _oc, _owc;
-	randomized_lfsr randomized_lfsr(CLK, 0, _oc, _owc, random);
+	wire [7:0] random;
+	randomized_lfsr_weak randomized_lfsr_weak(CLK, 0, random);
 
 	ws2812_output ws2812(CLK, 0, trigger, random[7:0], more_leds, data_request, ws2812_dataline);
 
