@@ -60,5 +60,5 @@ set_io --warn-no-port J1_10 119
 #set_io --warn-no-port J3_7  48
 #set_io --warn-no-port J3_8  47
 #set_io --warn-no-port J3_9  45
-#set_io --warn-no-port J3_10 44
+set_io --warn-no-port J3_10 44
 #
