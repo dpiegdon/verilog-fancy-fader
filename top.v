@@ -1,6 +1,6 @@
 `default_nettype none
 
-module top(input wire CLK, output wire J1_7, output wire J1_8, output wire J1_9, output wire J1_10);
+module top(input wire CLK, output wire J1_8, output wire J1_9, output wire J1_10);
 
 	localparam LEDS=40;
 	// NOTE: INTERPOLATIONS better be a power-of-two.
@@ -11,8 +11,7 @@ module top(input wire CLK, output wire J1_7, output wire J1_8, output wire J1_9,
 
 	localparam HOLDOFF_MAX=1200000;
 
-	wire rst;
-	assign rst = 0;
+	wire rst = 0;
 
 	reg [$clog2(HOLDOFF_MAX) : 0] holdoff = 0;
 
@@ -26,24 +25,23 @@ module top(input wire CLK, output wire J1_7, output wire J1_8, output wire J1_9,
 	reg [$clog2(INTERPOLATIONS):0] current_interpolation;
 	reg [2:0] current_rgb;
 
-	wire trigger;
-	assign trigger = (0 == holdoff);
-	assign J1_9 = trigger;
+	wire trigger = (0 == holdoff);
 	wire data_request;
-	assign J1_8 = data_request;
 	wire [7:0] color_now_postgamma;
 	ws2812_output ws2812(CLK, rst, trigger, color_now_postgamma, trigger, data_request, J1_10);
 
-	wire [7:0] milestone_color_prev;
-	assign milestone_color_prev = colors[ (current_milestone+0) * 8*3 + current_rgb * 8 + 7 : (current_milestone+0) * 8*3 + current_rgb * 8];
-	wire [7:0] milestone_color_next;
-	assign milestone_color_next = colors[ (current_milestone+1) * 8*3 + current_rgb * 8 + 7 : (current_milestone+1) * 8*3 + current_rgb * 8];
-	wire [7:0] color_now;
-	assign color_now = (milestone_color_prev*current_interpolation + milestone_color_prev*(INTERPOLATIONS-current_interpolation)) / INTERPOLATIONS;
+	wire [$clog2(COLORBITS-1):0] index_prev = (current_milestone+0) * 8*3 + current_rgb * 8;
+	wire [$clog2(COLORBITS-1):0] index_next = (current_milestone+1) * 8*3 + current_rgb * 8;
+	wire [7:0] milestone_color_prev = colors[ index_prev+7 : index_prev ];
+	wire [7:0] milestone_color_next = colors[ index_next+7 : index_next ];
+	wire [7:0] color_now = (milestone_color_prev*current_interpolation + milestone_color_prev*(INTERPOLATIONS-current_interpolation)) / INTERPOLATIONS;
 	gammasight gammasight(color_now, color_now_postgamma);
 
 	wire [15:0] random;
 	randomized_lfsr randomized_lfsr_weak(.clk(CLK), .rst(rst), .out(random));
+
+	assign J1_9 = trigger;
+	assign J1_8 = data_request;
 
 	always @(posedge CLK) begin
 		if(rst) begin
