@@ -16,29 +16,31 @@ module top(input wire CLK, output wire J1_8, output wire J1_9, output wire J1_10
 	reg [$clog2(HOLDOFF_MAX) : 0] holdoff = 0;
 
 	// store for colors, addressed via [COLOR][rgb][bit].
-	reg [COLORBITS-1:0] colors;
+	reg [COLORBITS-1:0] colors = 0;
 
-	reg [$clog2(INTERPOLATIONS):0] start_interpolation;
+	reg [$clog2(INTERPOLATIONS-1):0] start_interpolation = 0;
 
-	reg [$clog2(LEDS):0] current_led;
-	reg [$clog2(MILESTONES):0] current_milestone;
-	reg [$clog2(INTERPOLATIONS):0] current_interpolation;
-	reg [2:0] current_rgb;
+	reg [$clog2(LEDS-1):0] current_led = 0;
+	reg [$clog2(MILESTONES-1):0] current_milestone = 0;
+	reg [$clog2(INTERPOLATIONS-1):0] current_interpolation = 0;
+	reg [$clog2(3-1):0] current_rgb = 0;
 
 	wire trigger = (0 == holdoff);
 	wire data_request;
 	wire [7:0] color_now_postgamma;
 	ws2812_output ws2812(CLK, rst, trigger, color_now_postgamma, trigger, data_request, J1_10);
 
-	wire [$clog2(COLORBITS-1):0] index_prev = (current_milestone+0) * 8*3 + current_rgb * 8;
-	wire [$clog2(COLORBITS-1):0] index_next = (current_milestone+1) * 8*3 + current_rgb * 8;
+	wire [$clog2(COLORBITS-1):0] index_prev = current_milestone * 8*3 + current_rgb * 8;
+	wire [$clog2(COLORBITS-1):0] index_next = index_prev + 8*3;
 	wire [7:0] milestone_color_prev = colors[ index_prev+7 : index_prev ];
 	wire [7:0] milestone_color_next = colors[ index_next+7 : index_next ];
 	wire [7:0] color_now = (milestone_color_next*current_interpolation + milestone_color_prev*(INTERPOLATIONS-current_interpolation)) / INTERPOLATIONS;
 	gammasight gammasight(color_now, color_now_postgamma);
 
 	wire [15:0] random;
-	randomized_lfsr randomized_lfsr_weak(.clk(CLK), .rst(rst), .out(random));
+	randomized_lfsr_weak
+		#(.WIDTH('d16), .INIT_VALUE(16'b1010_1100_1110_0001), .FEEDBACK(16'b0000_0000_0010_1101))
+		randomized_lfsr_weak(.clk(CLK), .rst(rst), .out(random));
 
 	assign J1_9 = trigger;
 	assign J1_8 = data_request;
