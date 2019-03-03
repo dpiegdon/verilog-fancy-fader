@@ -34,7 +34,7 @@ module top(input wire CLK, output wire J1_8, output wire J1_9, output wire J1_10
 	wire [$clog2(COLORBITS-1):0] index_next = (current_milestone+1) * 8*3 + current_rgb * 8;
 	wire [7:0] milestone_color_prev = colors[ index_prev+7 : index_prev ];
 	wire [7:0] milestone_color_next = colors[ index_next+7 : index_next ];
-	wire [7:0] color_now = (milestone_color_prev*current_interpolation + milestone_color_prev*(INTERPOLATIONS-current_interpolation)) / INTERPOLATIONS;
+	wire [7:0] color_now = (milestone_color_next*current_interpolation + milestone_color_prev*(INTERPOLATIONS-current_interpolation)) / INTERPOLATIONS;
 	gammasight gammasight(color_now, color_now_postgamma);
 
 	wire [15:0] random;
