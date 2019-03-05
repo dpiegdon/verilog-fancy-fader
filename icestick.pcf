@@ -37,7 +37,7 @@ set_io --warn-no-port CLK 21
 #set_io --warn-no-port J1_4  113
 #set_io --warn-no-port J1_5  114
 #set_io --warn-no-port J1_6  115
-set_io --warn-no-port J1_7  116
+#set_io --warn-no-port J1_7  116
 set_io --warn-no-port J1_8  117
 set_io --warn-no-port J1_9  118
 set_io --warn-no-port J1_10 119
@@ -60,5 +60,5 @@ set_io --warn-no-port J1_10 119
 #set_io --warn-no-port J3_7  48
 #set_io --warn-no-port J3_8  47
 #set_io --warn-no-port J3_9  45
-set_io --warn-no-port J3_10 44
+#set_io --warn-no-port J3_10 44
 #
