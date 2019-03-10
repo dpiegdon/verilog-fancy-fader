@@ -1,6 +1,7 @@
 `default_nettype none
 
-module ws2812_output(input wire clk, input wire rst, input wire trigger, input wire [7:0] data_in, input wire data_valid, output wire data_request, output wire out);
+module ws2812_output_shifter(input wire clk, input wire rst, input wire trigger, input wire [7:0] data_in, input wire data_valid,
+		output wire data_request, output wire out);
 
 	// INPUT_CLOCK should not be much smaller than 12MHz
 	parameter INPUT_CLOCK = 12_000_000;

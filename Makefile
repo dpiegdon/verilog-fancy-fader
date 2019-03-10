@@ -32,7 +32,9 @@ top.json: \
 	buildingblocks/ringoscillator.v \
 	buildingblocks/lfsr.v \
 	buildingblocks/random.v \
-	ws2812_output.v \
+	ws2812_fancy_fader.v \
+	ws2812_gammasight.v \
+	ws2812_output_shifter.v \
 	top.v
 
 
