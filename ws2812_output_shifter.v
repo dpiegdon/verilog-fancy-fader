@@ -22,20 +22,21 @@ module ws2812_output_shifter(input wire clk, input wire rst, input wire trigger,
 	localparam TRANSMIT_LO = 3;
 	localparam TAILGUARD = 4;
 
-	reg [$clog2(TAILGUARD):0] state = IDLE;
+	reg [$clog2(TAILGUARD):0] state = TAILGUARD;
 
 	reg [6:0] tx_data;
 	reg [$clog2(7)-1:0] tx_bits;
 	reg [$clog2(MAXTIME_HI):0] timer_high;
 	reg [$clog2(MAXTIME_LO):0] timer_low;
-	reg [$clog2(TIME_RESET):0] timer_tail;
+	reg [$clog2(TIME_RESET):0] timer_tail = TIME_RESET;
 
 	assign data_request = (RECEIVE == state);
 	assign out = (TRANSMIT_HI == state);
 
 	always @ (posedge clk) begin
 		if(rst) begin
-			state <= IDLE;
+			state <= TAILGUARD;
+			timer_tail <= TIME_RESET;
 		end
 
 		case(state)
