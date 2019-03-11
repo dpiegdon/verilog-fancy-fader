@@ -1,6 +1,6 @@
 `default_nettype none
 
-module top(input wire CLK, output wire J1_8, output wire J1_9, output wire J1_10);
+module top(input wire CLK, output wire J1_7, output wire J1_8, output wire J1_9, output wire J1_10);
 
 	wire rst = 0;
 
@@ -21,6 +21,7 @@ module top(input wire CLK, output wire J1_8, output wire J1_9, output wire J1_10
 
 	assign J1_9 = trigger;
 	assign J1_8 = data_request;
+	assign J1_7 = 0;
 
 endmodule
 

@@ -35,8 +35,8 @@ module ws2812_output_shifter(input wire clk, input wire rst, input wire trigger,
 
 	always @ (posedge clk) begin
 		if(rst) begin
-			state <= TAILGUARD;
-			timer_tail <= TIME_RESET;
+			state = TAILGUARD;
+			timer_tail = TIME_RESET;
 		end
 
 		case(state)
@@ -91,7 +91,8 @@ module ws2812_output_shifter(input wire clk, input wire rst, input wire trigger,
 			end
 
 			default: begin
-				state <= IDLE;
+				state <= TAILGUARD;
+				timer_tail <= TIME_RESET;
 			end
 		endcase
 	end
