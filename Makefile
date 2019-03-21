@@ -41,6 +41,7 @@ clean:
 
 
 top.json: \
+	buildingblocks/synchronous_reset_timer.v \
 	buildingblocks/ringoscillator.v \
 	buildingblocks/lfsr.v \
 	buildingblocks/random.v \

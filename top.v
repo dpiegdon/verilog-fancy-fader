@@ -2,7 +2,8 @@
 
 module top(input wire CLK, output wire J1_7, output wire J1_8, output wire J1_9, output wire J1_10);
 
-	wire rst = 0;
+	wire rst;
+	synchronous_reset_timer reset_generator(CLK, rst, 1'b0);
 
 	wire [15:0] random;
 	randomized_lfsr_weak

@@ -15,14 +15,14 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 
 	// NOTE the +1 at the end of MILESTONES: avoids index-error for milestone_color_prev.
 	localparam MILESTONES=$rtoi($ceil((LEDS*1.0)/INTERPOLATIONS)) + 1;
-	localparam COLORBITS=MILESTONES*8*3;
+	localparam RGB_MILESTONES=MILESTONES*3;
 
 
 	// timeout in between full transmissions to WS2812 strip
 	reg [$clog2(HOLDOFF_TIME) : 0] holdoff = 0;
 
 	// store for color milestones
-	reg [COLORBITS-1:0] milestones = 0;
+	reg [7:0] milestones [RGB_MILESTONES];
 
 	// interpolation step we started at when starting this iteration of
 	// the full color strip
@@ -34,23 +34,24 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 	reg [$clog2(INTERPOLATIONS-1):0] current_interpolation = 0;
 	reg [$clog2(3-1):0] current_rgb = 0;
 
-
 	assign trigger = (0 == holdoff);
 
-	wire [$clog2(COLORBITS-1):0] index_next = forward_milestone * 8*3 + current_rgb * 8;
-	wire [$clog2(COLORBITS-1):0] index_prev = index_next + 8*3;
-	wire [7:0] milestone_color_next = milestones[ index_next+7 : index_next ];
-	wire [7:0] milestone_color_prev = milestones[ index_prev+7 : index_prev ];
+	wire [$clog2(RGB_MILESTONES-1):0] index_next = forward_milestone * 3 + current_rgb;
+	wire [$clog2(RGB_MILESTONES-1):0] index_prev = index_next + 3;
+	wire [7:0] milestone_color_next = milestones[index_next];
+	wire [7:0] milestone_color_prev = milestones[index_prev];
 	// actual output color for the current LED
 	assign color_now =  (  milestone_color_next*(INTERPOLATIONS-current_interpolation)
 				 + milestone_color_prev*current_interpolation
 				) / INTERPOLATIONS;
 
+	integer i;
 
 	always @(posedge clk) begin
 		if(rst) begin
 			holdoff <= 0;
-			milestones <= 0;
+			for(i = 0; i < RGB_MILESTONES; i=i+1)
+				milestones[i] <= 0;
 			start_interpolation <= 0;
 			current_led <= 0;
 			forward_milestone <= 0;
@@ -95,12 +96,11 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 							// and start interpolating towards it.
 							start_interpolation <= INTERPOLATIONS-1;
 							current_interpolation <= INTERPOLATIONS-1;
-							milestones <= { 
-									milestones[COLORBITS-1-8*3 : 0],
-									random[14:10], 3'b0,
-									random[9:5], 3'b0,
-									random[4:0], 3'b0
-								};
+							for(i = RGB_MILESTONES-1; i > 2; i=i-1)
+								milestones[i] = milestones[i-3];
+							milestones[2] = {random[14:10], 3'b0};
+							milestones[1] = {random[9:5], 3'b0};
+							milestones[0] = {random[4:0], 3'b0};
 						end
 					end
 				end
