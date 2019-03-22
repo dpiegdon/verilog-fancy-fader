@@ -36,6 +36,7 @@ clean:
 	-rm -f *.bin
 	-rm -f *.rpt
 	-rm *_tb.test
+	-rm *_tb.vcd
 
 
 

@@ -17,10 +17,17 @@ module ws2812_fancy_fader_tb();
 	always #1 clk = clk+1;
 
 	initial begin
+		$dumpfile("ws2812_fancy_fader_tb.vcd");
+		$dumpvars(0, ws2812_fancy_fader_tb);
+
 		clk = 0;
 		rst = 0;
 		random = 0;
 		data_request = 0;
+
+		repeat(100) @(posedge clk);
+
+		$finish;
 	end
 
 endmodule

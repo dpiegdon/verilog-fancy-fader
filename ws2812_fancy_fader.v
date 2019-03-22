@@ -15,43 +15,42 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 
 	// NOTE the +1 at the end of MILESTONES: avoids index-error for milestone_color_prev.
 	localparam MILESTONES=$rtoi($ceil((LEDS*1.0)/INTERPOLATIONS)) + 1;
-	localparam RGB_MILESTONES=MILESTONES*3;
 
 
 	// timeout in between full transmissions to WS2812 strip
-	reg [$clog2(HOLDOFF_TIME) : 0] holdoff = 0;
+	reg [$clog2(HOLDOFF_TIME)-1 : 0] holdoff = 0;
 
 	// store for color milestones
-	reg [7:0] milestones [RGB_MILESTONES];
+	reg [7:0] milestones [MILESTONES-1:0][3-1:0];
 
 	// interpolation step we started at when starting this iteration of
 	// the full color strip
-	reg [$clog2(INTERPOLATIONS-1):0] start_interpolation = 0;
+	reg [$clog2(INTERPOLATIONS)-1:0] start_interpolation = 0;
 
 	// index variables for single run over the full color strip
-	reg [$clog2(LEDS-1):0] current_led = 0;
-	reg [$clog2(MILESTONES-1):0] forward_milestone = 0;
-	reg [$clog2(INTERPOLATIONS-1):0] current_interpolation = 0;
-	reg [$clog2(3-1):0] current_rgb = 0;
+	reg [$clog2(LEDS)-1:0] current_led = 0;
+	reg [$clog2(MILESTONES)-1:0] forward_milestone = 0;
+	reg [$clog2(INTERPOLATIONS)-1:0] current_interpolation = 0;
+	reg [$clog2(3)-1:0] current_rgb = 0;
 
 	assign trigger = (0 == holdoff);
 
-	wire [$clog2(RGB_MILESTONES-1):0] index_next = forward_milestone * 3 + current_rgb;
-	wire [$clog2(RGB_MILESTONES-1):0] index_prev = index_next + 3;
-	wire [7:0] milestone_color_next = milestones[index_next];
-	wire [7:0] milestone_color_prev = milestones[index_prev];
+	wire [7:0] milestone_color_next = milestones[forward_milestone][current_rgb];
+	wire [7:0] milestone_color_prev = milestones[forward_milestone+1][current_rgb];
 	// actual output color for the current LED
 	assign color_now =  (  milestone_color_next*(INTERPOLATIONS-current_interpolation)
 				 + milestone_color_prev*current_interpolation
 				) / INTERPOLATIONS;
 
 	integer i;
+	integer k;
 
 	always @(posedge clk) begin
 		if(rst) begin
 			holdoff <= 0;
-			for(i = 0; i < RGB_MILESTONES; i=i+1)
-				milestones[i] <= 0;
+			for(i=0; i<MILESTONES; i=i+1)
+				for(k=0; k<3; k=k+1)
+					milestones[i][k] <= 0;
 			start_interpolation <= 0;
 			current_led <= 0;
 			forward_milestone <= 0;
@@ -96,11 +95,12 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 							// and start interpolating towards it.
 							start_interpolation <= INTERPOLATIONS-1;
 							current_interpolation <= INTERPOLATIONS-1;
-							for(i = RGB_MILESTONES-1; i > 2; i=i-1)
-								milestones[i] = milestones[i-3];
-							milestones[2] = {random[14:10], 3'b0};
-							milestones[1] = {random[9:5], 3'b0};
-							milestones[0] = {random[4:0], 3'b0};
+							for(i=MILESTONES-1; i > 0; i=i-1)
+								for(k=0; k<3; k=k+1)
+									milestones[i][k] <= milestones[i-1][k];
+							milestones[0][2] <= {random[14:10], 3'b0};
+							milestones[0][1] <= {random[9:5], 3'b0};
+							milestones[0][0] <= {random[4:0], 3'b0};
 						end
 					end
 				end
