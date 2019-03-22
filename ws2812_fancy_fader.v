@@ -21,7 +21,7 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 	reg [$clog2(HOLDOFF_TIME)-1 : 0] holdoff = 0;
 
 	// store for color milestones
-	reg [7:0] milestones [MILESTONES-1:0][3-1:0];
+	reg [7:0] milestones [MILESTONES:0][3-1:0];
 
 	// interpolation step we started at when starting this iteration of
 	// the full color strip
@@ -95,7 +95,7 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 							// and start interpolating towards it.
 							start_interpolation <= INTERPOLATIONS-1;
 							current_interpolation <= INTERPOLATIONS-1;
-							for(i=MILESTONES-1; i > 0; i=i-1)
+							for(i=MILESTONES; i > 0; i=i-1)
 								for(k=0; k<3; k=k+1)
 									milestones[i][k] <= milestones[i-1][k];
 							milestones[0][2] <= {random[14:10], 3'b0};
