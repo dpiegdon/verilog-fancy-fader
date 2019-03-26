@@ -35,66 +35,66 @@ module ws2812_output_shifter(input wire clk, input wire rst, input wire trigger,
 
 	always @ (posedge clk) begin
 		if(rst) begin
-			state = TAILGUARD;
-			timer_tail = TIME_RESET;
-		end
-
-		case(state)
-			IDLE: begin
-				if(trigger) begin
-					state <= RECEIVE;
-				end
-			end
-
-			RECEIVE: begin
-				if(data_valid) begin
-					timer_high <= (data_in[7]) ? TIME_T1H : TIME_T0H;
-					timer_low  <= (data_in[7]) ? TIME_T1L : TIME_T0L;
-					tx_data <= data_in[6:0];
-					tx_bits <= 7;
-					state <= TRANSMIT_HI;
-				end else begin
-					timer_tail <= TIME_RESET;
-					state <= TAILGUARD;
-				end
-			end
-
-			TRANSMIT_HI: begin
-				if(timer_high) begin
-					timer_high = timer_high-1;
-				end else begin
-					state <= TRANSMIT_LO;
-				end
-			end
-
-			TRANSMIT_LO: begin
-				if(timer_low) begin
-					timer_low = timer_low-1;
-				end else begin
-					if(tx_bits) begin
-						timer_high <= (tx_data[6]) ? TIME_T1H : TIME_T0H;
-						timer_low  <= (tx_data[6]) ? TIME_T1L : TIME_T0L;
-						tx_data = {tx_data[5:0], 1'b0};
-						tx_bits <= tx_bits-1;
-						state <= TRANSMIT_HI;
-					end else begin
+			state <= TAILGUARD;
+			timer_tail <= TIME_RESET;
+		end else begin
+			case(state)
+				IDLE: begin
+					if(trigger) begin
 						state <= RECEIVE;
 					end
 				end
-			end
 
-			TAILGUARD: begin
-				if(timer_tail)
-					timer_tail = timer_tail-1;
-				else
-					state <= IDLE;
-			end
+				RECEIVE: begin
+					if(data_valid) begin
+						timer_high <= (data_in[7]) ? TIME_T1H : TIME_T0H;
+						timer_low  <= (data_in[7]) ? TIME_T1L : TIME_T0L;
+						tx_data <= data_in[6:0];
+						tx_bits <= 7;
+						state <= TRANSMIT_HI;
+					end else begin
+						timer_tail <= TIME_RESET;
+						state <= TAILGUARD;
+					end
+				end
 
-			default: begin
-				state <= TAILGUARD;
-				timer_tail <= TIME_RESET;
-			end
-		endcase
+				TRANSMIT_HI: begin
+					if(timer_high) begin
+						timer_high <= timer_high-1;
+					end else begin
+						state <= TRANSMIT_LO;
+					end
+				end
+
+				TRANSMIT_LO: begin
+					if(timer_low) begin
+						timer_low <= timer_low-1;
+					end else begin
+						if(tx_bits) begin
+							timer_high <= (tx_data[6]) ? TIME_T1H : TIME_T0H;
+							timer_low  <= (tx_data[6]) ? TIME_T1L : TIME_T0L;
+							tx_data <= {tx_data[5:0], 1'b0};
+							tx_bits <= tx_bits-1;
+							state <= TRANSMIT_HI;
+						end else begin
+							state <= RECEIVE;
+						end
+					end
+				end
+
+				TAILGUARD: begin
+					if(timer_tail)
+						timer_tail <= timer_tail-1;
+					else
+						state <= IDLE;
+				end
+
+				default: begin
+					state <= TAILGUARD;
+					timer_tail <= TIME_RESET;
+				end
+			endcase
+		end
 	end
 
 endmodule
