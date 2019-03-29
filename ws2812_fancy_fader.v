@@ -5,12 +5,12 @@ module ws2812_fancy_fader(input wire clk, input wire rst, input wire [15:0] rand
 		output wire trigger, output wire [7:0] color_now);
 
 	// number of LEDs to be controlled.
-	parameter LEDS=32;
+	parameter LEDS=128;
 	// number of interpolation steps between uniq random color milestones
 	// NOTE: this must be a power of two.
-	parameter INTERPOLATIONS=8;
+	parameter INTERPOLATIONS=16;
 	// scroll speed. time to wait after all LEDs have been addressed.
-	parameter HOLDOFF_TIME=800000;
+	parameter HOLDOFF_TIME=700000;
 
 
 	// NOTE the +1 at the end of MILESTONES: avoids index-error for milestone_color_prev.
