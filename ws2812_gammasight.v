@@ -4,8 +4,9 @@
 // returns in^2 / 2^8
 module ws2812_gammasight(input wire [7:0] in, output wire [7:0] out);
 
-	wire [15:0] square = in*in;
-	assign out = square[15:8];
+	//wire [15:0] square = in*in;
+	//assign out = square[15:8];
+	assign out = in;
 
 endmodule
 
