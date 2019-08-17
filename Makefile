@@ -41,10 +41,11 @@ clean:
 
 
 top.json: \
-	verilog-buildingblocks/synchronous_reset_timer.v \
-	verilog-buildingblocks/ringoscillator.v \
-	verilog-buildingblocks/lfsr.v \
+	verilog-buildingblocks/lattice_ice40/ringoscillator.v \
+	verilog-buildingblocks/lattice_ice40/random.v \
 	verilog-buildingblocks/random.v \
+	verilog-buildingblocks/lfsr.v \
+	verilog-buildingblocks/synchronous_reset_timer.v \
 	ws2812_fancy_fader.v \
 	ws2812_gammasight.v \
 	ws2812_output_shifter.v \
